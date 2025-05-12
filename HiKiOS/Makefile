@@ -30,3 +30,4 @@ $(KERNEL): $(OBJS)
 
 clean:
 	rm -f $(OBJS) $(KERNEL)
+
