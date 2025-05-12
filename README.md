@@ -1,5 +1,5 @@
-# kernel
-Building Kernel from scratch .. cause why not do hard stuff... ehehehee
+# HiKiOS
+Building os from scratch .. cause why not do hard stuff... ehehehee
 
 
 # How To Run A Assembly File
