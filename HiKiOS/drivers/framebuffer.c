@@ -1,6 +1,6 @@
 #include <stdint.h>
 #include <stddef.h>
-#include "../../include/drivers/framebuffer.h"
+#include "drivers/framebuffer.h"
 
 // These will be set from multiboot info or bootloader
 uint32_t* framebuffer = 0;
@@ -145,5 +145,47 @@ void fb_write_string(const char* str, int x, int y, uint32_t color) {
         fb_draw_char(*str, x, y, color);
         x += 8;
         str++;
+    }
+}
+
+void fb_draw_string(const char* str, int x, int y, uint32_t color) {
+    while (*str) {
+        fb_draw_char(*str, x, y, color);
+        x += 8; // Move to the next character (8 pixels wide)
+        str++;
+    }
+}
+
+#define VIDEO_ADDRESS 0xB8000
+#define MAX_ROWS 25
+#define MAX_COLS 80
+#define WHITE_ON_BLACK 0x0F
+
+volatile uint16_t* video_memory = (uint16_t*) VIDEO_ADDRESS;
+
+static uint8_t cursor_row = 0;
+static uint8_t cursor_col = 0;
+
+void fb_print(const char* str) {
+    while (*str) {
+        char c = *str++;
+
+        if (c == '\n') {
+            cursor_col = 0;
+            cursor_row++;
+        } else {
+            if (cursor_row >= MAX_ROWS) {
+                cursor_row = 0;  // wrap or scroll if desired
+            }
+
+            uint16_t position = cursor_row * MAX_COLS + cursor_col;
+            video_memory[position] = (WHITE_ON_BLACK << 8) | c;
+
+            cursor_col++;
+            if (cursor_col >= MAX_COLS) {
+                cursor_col = 0;
+                cursor_row++;
+            }
+        }
     }
 }

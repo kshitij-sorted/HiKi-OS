@@ -7,4 +7,5 @@ void fb_draw_pixel(int x, int y, uint32_t color);
 void fb_clear(uint32_t color);
 void fb_draw_char(char c, int x, int y, uint32_t color);
 void fb_write_string(const char* str, int x, int y, uint32_t color);
+void fb_print(const char* str);
 

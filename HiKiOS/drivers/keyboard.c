@@ -1,5 +1,5 @@
-#include "../include/keyboard.h"
-#include "../include/ports.h"
+#include "keyboard.h"
+#include "ports.h"
 
 char scancode_to_ascii_table[128] = {
     0, 27, '1','2','3','4','5','6','7','8','9','0','-','=','\b',
