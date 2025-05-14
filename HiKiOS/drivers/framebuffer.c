@@ -17,7 +17,7 @@ void fb_init(uint32_t* addr, uint32_t w, uint32_t h, uint32_t p, uint8_t bits_pe
     bpp = bits_per_pixel;
 }
 
-void fb_draw_pixel(int x, int y, uint32_t color) {
+void fb_draw_pixel(uint32_t x, uint32_t y, uint8_t color) {
     if (x >= screen_width || y >= screen_height) return;
     framebuffer[y * (pitch / 4) + x] = color;
 }
@@ -126,7 +126,7 @@ static const uint8_t font8x8_basic[96][8] = {
     [94] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}, // ~
 };
 
-void fb_draw_char(char c, int x, int y, uint32_t color) {
+void fb_draw_char(int c, int x, int y, uint32_t color) {
     if (c < 32 || c > 127) return;
     const uint8_t* glyph = font8x8_basic[c - 32];
 
@@ -160,11 +160,13 @@ void fb_draw_string(const char* str, int x, int y, uint32_t color) {
 #define MAX_ROWS 25
 #define MAX_COLS 80
 #define WHITE_ON_BLACK 0x0F
+#define VIDEO_MEMORY ((uint8_t*)0xB8000)
 
 volatile uint16_t* video_memory = (uint16_t*) VIDEO_ADDRESS;
 
 static uint8_t cursor_row = 0;
 static uint8_t cursor_col = 0;
+static uint16_t cursor_offset = 0;
 
 void fb_print(const char* str) {
     while (*str) {
@@ -187,5 +189,26 @@ void fb_print(const char* str) {
                 cursor_row++;
             }
         }
+    }
+}
+
+void fb_print_char(char c) {
+    if (c == '\n') {
+        // Move to start of next line
+        cursor_offset += (MAX_COLS - (cursor_offset % MAX_COLS));
+    } else {
+        if (cursor_offset >= MAX_COLS * MAX_ROWS) {
+            // Scroll or reset if needed
+            cursor_offset = 0;
+        }
+
+        uint16_t location = cursor_offset * 2;
+        VIDEO_MEMORY[location] = c;
+        if (location + 1 < VIDEO_MEMORY) {
+            VIDEO_MEMORY[location + 1] = WHITE_ON_BLACK;
+        } else {
+            // Handle the error or adjust location as needed
+        }
+        cursor_offset++;
     }
 }

@@ -1,15 +1,9 @@
 #include "stdio.h"
+#include "drivers/framebuffer.h"
 
 // Function to print a single character to the screen using BIOS interrupt 0x10
 void putchar(char c) {
-    __asm__ (
-        "movb %0, %%al\n"         // Load char into AL
-        "movb $0x0E, %%ah\n"      // BIOS teletype function
-        "int $0x10\n"              // BIOS interrupt
-        :
-        : "r" (c)
-        : "%ax"
-    );
+    fb_print_char(c);
 }
 
 // Function to print a null-terminated string

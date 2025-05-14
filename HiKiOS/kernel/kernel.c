@@ -12,8 +12,16 @@ void kernel_main() {
             char scancode = inb(0x60);
             char c = scancode_to_ascii(scancode);
             if (c) {
-                fb_print("%c", c); // Display character to screen
+                putchar(c); // Display character to screen
             }
         }
     }
 }
+void print(const char *str) {
+    char *video = (char *) 0xB8000;  // VGA text buffer starting address
+    while (*str) {
+        *video++ = *str++;
+        *video++ = 0x07;  // White text on black background
+    }
+}
+
