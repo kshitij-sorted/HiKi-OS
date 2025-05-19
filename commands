@@ -1,0 +1,11 @@
+Create bootloader.o: nasm -f elf bootloader.asm -o bootloader.o
+Compile kernel to kernel.o: i686-elf-gcc -ffreestanding -m32 -c kernel.c -o kernel.o
+Linking kernel to bootloader: i686-elf-ld -Ttext 0x100000 -o kernel.elf bootloader.o kernel.o --oformat=elf32-i386
+
+Create the folders and files:
+mkdir -p isodir/boot/grub
+cp kernel.elf isodir/boot/
+cp grub/grub.cfg isodir/boot/grub/
+
+Create bootable iso: grub-mkrescue -o hikios.iso isodir
+Run qemu: qemu-system-i386 -cdrom hikios.iso -boot d
